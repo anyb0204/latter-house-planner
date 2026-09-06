@@ -3,6 +3,11 @@ name: Flask CI
 on:
   push:
     branches: [ "main", "claude/**" ]
+name: Jekyll site CI
+
+on:
+  push:
+    branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
 
@@ -28,3 +33,13 @@ jobs:
         run: |
           test -f templates/login.html && echo "login.html OK"
           test -f templates/planner.html && echo "planner.html OK"
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Build the site in the jekyll/builder container
+      run: |
+        docker run \
+        -v ${{ github.workspace }}:/srv/jekyll -v ${{ github.workspace }}/_site:/srv/jekyll/_site \
+        jekyll/builder:latest /bin/bash -c "chmod -R 777 /srv/jekyll && jekyll build --future"
